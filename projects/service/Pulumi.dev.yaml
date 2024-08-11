@@ -1,0 +1,4 @@
+config:
+  aws:region: us-west-2
+  service:image: nginx
+  service:port: "80"

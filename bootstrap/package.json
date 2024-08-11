@@ -1,0 +1,12 @@
+{
+    "name": "bootstrap",
+    "main": "index.ts",
+    "devDependencies": {
+        "@types/node": "^20.14.7",
+        "typescript": "^5.0.0"
+    },
+    "dependencies": {
+        "@pulumi/pulumi": "^3.113.0",
+        "@pulumi/pulumiservice": "^0.23.1"
+    }
+}
