@@ -7,32 +7,37 @@ const orgName = pulumi.getOrganization();
 
 const devAccessTeam = new pulumiservice.Team("dev", {
     organizationName: orgName,
+    name: "dev",
     teamType: "pulumi",
     members: [
         // TODO: Invite users and add them here.   
+        "luke-pulumi-corp"
     ],
 });
 
 const productionAccessTeam = new pulumiservice.Team("production", {
     organizationName: orgName,
+    name: "production",
     teamType: "pulumi",
     members: [
         // TODO: Add yoruself and other admins here.
+        "luke-pulumi-corp",
     ],
 });
 
 const prodAccessToken = new pulumiservice.TeamAccessToken("production", {
-    name: "production",
+    name: "production2",
     organizationName: orgName,
-    teamName: productionAccessTeam.id.apply(id => id!), 
-});
+    description: "Access token for the production team",
+    teamName: productionAccessTeam.name.apply(name => name!), 
+}, { deleteBeforeReplace: true });
 
 // Give the production team access to the bootstrap stack
 new pulumiservice.TeamStackPermission("boostrap-prod", {
     organization: orgName,
     project: boostrapProject,
     stack: bootstrapStack,
-    team: devAccessTeam.id,
+    team: devAccessTeam.name.apply(name => name!),
     permission: pulumiservice.TeamStackPermissionScope.Admin,
 });
 
@@ -51,17 +56,22 @@ for (const env of ["dev" /*, "prod" */]) {
     const baseDevStackDeploymentSetting = new pulumiservice.DeploymentSettings(`base-${env}`, {
         organization: orgName,
         project: "base",
-        stack: env,
-        sourceContext: {},
+        stack: baseDevStack.stackName,
+        sourceContext: {
+            git: {
+                branch: "main",
+            },
+        },
         github: {
-            repository: "lukehoban/",
-
+            repository: "pulumi-contoso/pulumi-cloud-bootstrap",
+            paths: ["projects/base-yaml"],
+            deployCommits: true,
+            previewPullRequests: true,
         },
     });
 }
 
-
-
+export const productionAccessToken = prodAccessToken.value;
 
 
 
