@@ -1,21 +1,11 @@
 name: base
 runtime: yaml
-description: A minimal Pulumi YAML program
+description: Base infrastructure needed in each environment.
 resources:
   # Replace this with definitions for the network, clusters, and other shared resources.
   name:
     type: random:RandomPet
     properties:
       length: 2
-  environment:
-    type: pulumiservice:Environment
-    properties:
-      name: ${name.id}
-      organization: ${pulumi.stack}
-      yaml: 
-        fn::stringAsset: |
-          values:
-            pulumiConfig:
-              environmentName: ${name.id}
 outputs:
   environmentName: ${name.id}
