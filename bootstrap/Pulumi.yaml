@@ -1,7 +1,4 @@
 name: pulumi-cloud-bootstrap
 runtime: nodejs
-description: A minimal TypeScript Pulumi program
-config:
-  pulumi:tags:
-    value:
-      pulumi:template: typescript
+description: Bootstrapping code for Pulumi Cloud configuration for this organization.
+

@@ -13,3 +13,14 @@ Pre-requisites:
 6. `pulumi up`
 
 Future: Ideally `pulumi new <this-template>` can be used to do step 3-6.
+
+Features:
+- [ ] Policy
+- [ ] Org Teamplates
+- [ ] Envrionments
+- [ ] Teams
+
+Three layers:
+* Pulumi Cloud infrastructure (teams, access tokens, policy, orgtemplates)
+* Shared base infrastructure per "environment" (Stack, DeploymentSettings, Environment, REviewStacks)
+* Per-app-team infrastructure ()

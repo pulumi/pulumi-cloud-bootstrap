@@ -46,20 +46,30 @@ new pulumiservice.TeamStackPermission("boostrap-prod", {
 // * Create two instances of the environment (dev, prod)
 // * Create ESC environments 
 
-for (const env of ["dev" /*, "prod" */]) {
-    const baseDevStack = new pulumiservice.Stack(`base-${env}`, {
+for (const env of ["dev" , "prod" ]) {
+    const baseStack = new pulumiservice.Stack(`base-${env}`, {
         organizationName: orgName,
         projectName: "base",
         stackName: env,
     });
-    
-    const baseDevStackDeploymentSetting = new pulumiservice.DeploymentSettings(`base-${env}`, {
+
+    const baseStackTag = new pulumiservice.StackTag(`base-${env}`, {
         organization: orgName,
         project: "base",
-        stack: baseDevStack.stackName,
+        stack: baseStack.stackName,
+        name: "environment",
+        value: env,
+    })
+    
+    const baseStackDeploymentSetting = new pulumiservice.DeploymentSettings(`base-${env}`, {
+        organization: orgName,
+        project: "base",
+        stack: baseStack.stackName,
         sourceContext: {
             git: {
-                branch: "main",
+                repoDir: "projects/base-yaml",
+                // TODO: Should this use different branches for deploying to dev and prod environments?
+                branch: "main", 
             },
         },
         github: {
@@ -69,6 +79,22 @@ for (const env of ["dev" /*, "prod" */]) {
             previewPullRequests: true,
         },
     });
+    // TODO: Actually trigger the deployment?  Right now, the user needs to go to the page and click "Actions -> Update"
+
+//     const baseESCEnv = new pulumiservice.Environment(`base-${env}`, {
+//         organization: orgName,
+//         name: `base/${env}`,
+//         yaml: new pulumi.asset.StringAsset(`\
+//             values:
+//                 base:
+//                     fn::open::pulumi-stacks:
+//                         stacks:
+//                             base:
+//                                 stack: base/${baseStack.stackName}
+//                 pulumiConfig:
+//                     baseEnvironmentName: \${base.stacks.base.environmentName}
+// `)
+//     });
 }
 
 export const productionAccessToken = prodAccessToken.value;
