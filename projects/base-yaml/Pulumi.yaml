@@ -1,4 +1,4 @@
-name: base-yaml
+name: base
 runtime: yaml
 description: A minimal Pulumi YAML program
 resources:
