@@ -70,7 +70,7 @@ for (const env of ["dev" , "prod" ]) {
         }
         return {
             repository: `${match[1]}/${match[2]}`,
-            paths: [baseProjectPath],
+            paths: [baseProjectPath+"/**"],
             deployCommits: true,
             previewPullRequests: true,
         };

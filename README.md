@@ -30,3 +30,6 @@ TODO:
 - [ ] Workload org templates
 - [ ] Ability to deploy via NPW
 - [ ] A nice first-class UX in Pulumi Cloud to deploy this without NPW
+
+
+https://app.pulumi.com/contoso/new-project?template=https:%2F%2Fgithub.com%2Fpulumi-contoso%2Fpulumi-cloud-bootstrap%2Ftree%2Fmain%2Fbootstrap
