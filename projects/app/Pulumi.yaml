@@ -1,0 +1,14 @@
+name: app
+runtime: yaml
+description: An application that runs on the base infrastructure.
+config:
+  environmentName:
+    type: string
+resources:
+  name:
+    type: random:RandomPet
+    properties:
+      prefix: ${environmentName}
+      length: 4
+outputs:
+  appName: ${name.id}
