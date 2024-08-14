@@ -154,12 +154,10 @@ async function getGitHubConfig() {
     if (!match) {
         return {};
     }
-    const x = {
+    return {
         repository: `${match[1]}/${match[2]}`,
         paths: [baseProjectPath+"/**"],
         deployCommits: true,
         previewPullRequests: true,
     };
-    console.log(x);
-    return x;
 };
