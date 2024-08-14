@@ -1,4 +1,9 @@
 name: pulumi-cloud-bootstrap
 runtime: nodejs
 description: Bootstrapping code for Pulumi Cloud configuration for this organization.
-
+template:
+  description: Bootstrapping code for Pulumi Cloud configuration for this organization.
+  config:
+    baseProject:
+      description: The base infrastructure per environment to deploy.  One of 'base-yaml' or 'base-aws-yaml'.
+      default: base-yaml

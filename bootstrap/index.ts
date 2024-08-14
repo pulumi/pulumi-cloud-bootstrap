@@ -22,54 +22,35 @@ if (!projectName) {
     throw new Error(`The project ${baseProject} does not exist in this repository`)
 }
 
-const devAccessTeam = new pulumiservice.Team("dev", {
-    organizationName: orgName,
-    name: "dev",
-    teamType: "pulumi",
-    members: [
-        // TODO: Invite users and add them here.   
-        "luke-pulumi-corp"
-    ],
-});
-
-const productionAccessTeam = new pulumiservice.Team("production", {
-    organizationName: orgName,
-    name: "production",
-    teamType: "pulumi",
-    members: [
-        // TODO: Add yoruself and other admins here.
-        "luke-pulumi-corp",
-    ],
-});
-
-const prodAccessToken = new pulumiservice.TeamAccessToken("production", {
-    name: "production2",
-    organizationName: orgName,
-    description: "Access token for the production team",
-    teamName: productionAccessTeam.name.apply(name => name!), 
-}, { deleteBeforeReplace: true });
-
-// Give the production team access to the bootstrap stack
-new pulumiservice.TeamStackPermission("boostrap-prod", {
-    organization: orgName,
-    project: boostrapProject,
-    stack: bootstrapStack,
-    team: productionAccessTeam.name.apply(name => name!),
-    permission: pulumiservice.TeamStackPermissionScope.Admin,
-});
-
-// TODO:
-// * Set up templates (environment, app)
-
 export let baseStacks: Record<string, pulumi.Output<string>> = {};
 
 for (const env of ["dev" , "prod" ]) {
+
+    const team = new pulumiservice.Team(env, {
+        organizationName: orgName,
+        name: env,
+        teamType: "pulumi",
+        description: `The ${env} team.`,
+        members: [
+            // TODO: Invite users and add them here.   
+            "luke-pulumi-corp"
+        ],
+    });
+
     const baseStack = new pulumiservice.Stack(`base-${env}`, {
         organizationName: orgName,
         projectName: projectName,
         stackName: env,
     });
 
+    const baseStackPermission = new pulumiservice.TeamStackPermission(`base-${env}`, {
+        organization: orgName,
+        project: projectName,
+        stack: env,
+        team: team.name.apply(name => name!),
+        permission: pulumiservice.TeamStackPermissionScope.Admin,
+    });
+    
     const baseStackTag = new pulumiservice.StackTag(`base-${env}`, {
         organization: orgName,
         project: baseStack.projectName,
@@ -110,10 +91,9 @@ for (const env of ["dev" , "prod" ]) {
     });
 
     // Trigger a deployment when the stack or deployment settings change
-    // TODO: Should this be part of the `Stack` or `DeploymentSetting` resource to trigger this 
-    // automatically on updates?
     const deployment = new command.local.Command(`deploy-base-${env}`, {       
-        create: pulumi.interpolate`pulumi deployment run update --stack ${orgName}/${baseStack.projectName}/${baseStack.stackName}`,
+        create: pulumi.interpolate`pulumi deployment run update --stack ${orgName}/${baseStack.projectName}/${baseStack.stackName} --suppress-stream-logs=false`,
+        delete: pulumi.interpolate`pulumi deployment run destroy --stack ${orgName}/${baseStack.projectName}/${baseStack.stackName} --suppress-stream-logs=false`,
         dir: baseStackDeploymentSetting.sourceContext.apply(source => `../${source.git!.repoDir}`),
         triggers: [baseStackDeploymentSetting.id, baseStack.id],
     });
@@ -127,6 +107,7 @@ for (const env of ["dev" , "prod" ]) {
                             stack: base/${stackName}
             pulumiConfig:
                 baseEnvironmentName: \${stack.base.environmentName}`));
+    // TODO: The above hard codes the outputs of the `base-yaml` stack. It will need to be made general.
 
     const baseESCEnv = new pulumiservice.Environment(`base-${env}`, {
         organization: orgName,
@@ -136,6 +117,6 @@ for (const env of ["dev" , "prod" ]) {
     baseStacks[env] = pulumi.interpolate`https://app.pulumi.com/${orgName}/${baseStack.projectName}/${baseStack.stackName}`;
 }
 
-export const productionAccessToken = prodAccessToken.value;
-
+// TODO:
+// * Set up templates (environment, app)
 
