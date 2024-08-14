@@ -6,6 +6,6 @@ resources:
   name:
     type: random:RandomPet
     properties:
-      length: 3
+      length: 4
 outputs:
   environmentName: ${name.id}
