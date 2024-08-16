@@ -1,4 +1,0 @@
-config:
-  pulumi:template: https://github.com/pulumi-contoso/pulumi-cloud-bootstrap/projects/app
-environment:
-  - base-dev
