@@ -93,7 +93,7 @@ for (const env of ["dev" , "prod" ]) {
                         base:
                             stack: base/${stackName}
             pulumiConfig:
-                baseEnvironmentName: \${stack.base.environmentName}`));
+                environmentName: \${stack.base.environmentName}`));
     // TODO: The above hard codes the outputs of the `base-yaml` stack. It will need to be made general.
 
     const baseESCEnv = new pulumiservice.Environment(`base-${env}`, {
@@ -102,47 +102,51 @@ for (const env of ["dev" , "prod" ]) {
         yaml: envYaml,
     });
 
-    const appStack = new pulumiservice.Stack(`app-${env}`, {
-        organizationName: orgName,
-        projectName: "app",
-        stackName: env,
-    });
+    // const appStack = new pulumiservice.Stack(`app-${env}`, {
+    //     organizationName: orgName,
+    //     projectName: "app",
+    //     stackName: env,
+    // });
 
+    // const appStackDeploymentSetting = new pulumiservice.DeploymentSettings(`app-${env}`, {
+    //     organization: orgName,
+    //     project: appStack.projectName,
+    //     stack: appStack.stackName,
+    //     operationContext: {
+    //         preRunCommands: [
+    //             pulumi.interpolate`pulumi config env add ${baseESCEnv.name} --stack ${orgName}/${appStack.projectName}/${appStack.stackName}`,
+    //         ],
+    //     },
+    //     sourceContext: {
+    //         git: {
+    //             repoDir: appProjectPath,
+    //             branch: "main", 
+    //         },
+    //     },
+    //     github: getGitHubConfig().then(github => ({
+    //         ...github,
+    //         paths: [appProjectPath+"/**"],              
+    //     })),
+    // });
 
-
-    const appStackDeploymentSetting = new pulumiservice.DeploymentSettings(`app-${env}`, {
-        organization: orgName,
-        project: appStack.projectName,
-        stack: appStack.stackName,
-        operationContext: {
-            preRunCommands: [
-                pulumi.interpolate`pulumi config set env ${baseESCEnv.name}`,
-            ],
-        },
-        sourceContext: {
-            git: {
-                repoDir: appProjectPath,
-                branch: "main", 
-            },
-        },
-        github: getGitHubConfig().then(github => ({
-            ...github,
-            paths: [appProjectPath+"/**"],              
-        })),
-    });
-
-    const appDeployment = new command.local.Command(`deploy-app-${env}`, {       
-        create: pulumi.interpolate`pulumi deployment run update --stack ${orgName}/${appStack.projectName}/${appStack.stackName} --suppress-stream-logs=false`,
-        delete: pulumi.interpolate`pulumi deployment run destroy --stack ${orgName}/${appStack.projectName}/${appStack.stackName} --suppress-stream-logs=false`,
-        dir: appStackDeploymentSetting.sourceContext.apply(source => `../${source.git!.repoDir}`),
-        triggers: [appStackDeploymentSetting.id, appStack.id],
-    });
+    // const appDeployment = new command.local.Command(`deploy-app-${env}`, {       
+    //     create: pulumi.interpolate`pulumi deployment run update --stack ${orgName}/${appStack.projectName}/${appStack.stackName} --suppress-stream-logs=false`,
+    //     delete: pulumi.interpolate`pulumi deployment run destroy --stack ${orgName}/${appStack.projectName}/${appStack.stackName} --suppress-stream-logs=false`,
+    //     dir: appStackDeploymentSetting.sourceContext.apply(source => `../${source.git!.repoDir}`),
+    //     triggers: [appStackDeploymentSetting.id, appStack.id, baseESCEnv.id],
+    // });
 
     baseStacks[env] = pulumi.interpolate`https://app.pulumi.com/${orgName}/${baseStack.projectName}/${baseStack.stackName}`;
 }
 
-// TODO:
-// * Set up templates (environment, app)
+const templates = new pulumiservice.TemplateSource("templates", {
+    organizationName: orgName,
+    sourceName: "apps",
+    sourceURL: remoteOriginUrl(),
+    destination: {
+        url: remoteOriginUrl(),
+    }
+});
 
 async function getGitHubConfig() {
     const url = await remoteOriginUrl();
@@ -161,3 +165,26 @@ async function getGitHubConfig() {
         previewPullRequests: true,
     };
 };
+
+// const policyGroup = new pulumiservice.PolicyGroup("production", {
+
+// });
+
+// for (const stack in productionStacks) {
+//     new pulumiservice.PolicyGroupStack(stack, {
+//         policyGroup: policyGroup.name,
+//         stack: stack,
+//     });
+// }
+
+// for (const policy of ["soc2" , "pci-dss" ]) {
+//     const policyPack = new pulumiservice.PolicyPack({
+//         name: policy,
+//         source: new pulumi.asset.FileArchive("../policy/"+policy),
+//     });
+//     new pulumiservice.PolicyGroupPolicyPack(policy, {
+//         policyGroup: policyGroup.name,
+//         policyPack: policyPack.name,
+//     });
+
+// }

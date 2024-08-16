@@ -24,11 +24,11 @@ Pre-requisites:
 Future: Ideally `pulumi new <this-template>` can be used to do step 3-6.
 
 TODO:
-- [ ] Policy
-- [ ] Org Templates (Iaro)
+- [ ] Policy (Iaro)
+- [x] Org Templates (Iaro)
 - [ ] AWS EKS + Kubernetes version of base (Rob)
-- [ ] Workload org templates
-- [ ] Ability to deploy via NPW
+- [ ] Workload org templates (Rob/Luke)
+- [ ] Ability to deploy via NPW (Luke)
 - [ ] A nice first-class UX in Pulumi Cloud to deploy this without NPW
 
 

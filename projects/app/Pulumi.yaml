@@ -1,6 +1,12 @@
 name: app
 runtime: yaml
 description: An application that runs on the base infrastructure.
+template:
+  description: A simple application!
+  config:
+    environmentName:
+      description: The name of the environment.
+      type: string
 config:
   environmentName:
     type: string
