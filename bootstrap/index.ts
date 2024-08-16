@@ -8,19 +8,9 @@ const bootstrapStack = pulumi.getStack();
 const orgName = pulumi.getOrganization();
 
 const config = new pulumi.Config();
-const baseProject = config.get("baseProject") || "base-yaml";
+const baseProject = config.get("baseProject") || "base";
 const baseProjectPath = `projects/${baseProject}`;
-
-// Map the selected project to the Pulumi project name.
-// TODO: We could read this from the filesystem instead of hadcoding it here.
-const projectName = {
-    "base-yaml": "base",
-    "service": "service",
-    "base": "base",
-}[baseProject];
-if (!projectName) {
-    throw new Error(`The project ${baseProject} does not exist in this repository`)
-}
+const projectName = baseProject;
 
 export let baseStacks: Record<string, pulumi.Output<string>> = {};
 
@@ -92,7 +82,7 @@ for (const env of ["dev" , "prod" ]) {
                             stack: base/${stackName}
             pulumiConfig:
                 environmentName: \${stack.base.environmentName}`));
-    // TODO: The above hard codes the outputs of the `base-yaml` stack. It will need to be made general.
+    // TODO: The above hard codes the outputs of the `base` stack. It will need to be made general.
 
     const baseESCEnv = new pulumiservice.Environment(`base-${env}`, {
         organization: orgName,
